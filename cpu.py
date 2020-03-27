@@ -247,7 +247,6 @@ class CPU:
                 self.pc += 1
 
                 if self.fg is not 0b00000001:
-                    print('jne')
                     # Address of instruction after call pushed onto Stack
                     self.register[self.sp] -= 1
                     self.ram[self.register[self.sp]] = self.pc
