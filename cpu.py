@@ -53,7 +53,7 @@ class CPU:
         elif op == 'MULT':
             self.register[reg_a] *= self.register[reg_b]
 
-        elif op == 'COMP':
+        elif op == 'CMP':
             # Reg a greater than reg b
             if self.register[reg_a] > self.register[reg_b]:
                 self.fg = 0b00000010
@@ -225,7 +225,7 @@ class CPU:
                 self.pc += 1
 
                 # ALU compare reg_1 with reg_2
-                self.alu('COMP', reg_1, reg_2)
+                self.alu('CMP', reg_1, reg_2)
 
             # JEQ compare
             elif self.ram[self.pc] is 0b01010101:
@@ -255,6 +255,7 @@ class CPU:
                 else:
                     self.pc += 1
 
+            # 
             elif self.ram[self.pc] is 0b01010100:
                 # Increment pc by 1
                 self.pc += 1
