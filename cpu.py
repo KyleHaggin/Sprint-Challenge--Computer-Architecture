@@ -16,7 +16,7 @@ class CPU:
 
         self.pc = 0
 
-        self.fg = 6
+        self.fg = 0b00000000
 
     def load(self, filepath):
         """Load a program into memory."""
@@ -56,13 +56,13 @@ class CPU:
         elif op == 'COMP':
             # Reg a greater than reg b
             if self.register[reg_a] > self.register[reg_b]:
-                self.register[self.fg] = 0b00000010
+                self.fg = 0b00000010
             # Reg a less than reg b
             elif self.register[reg_a] < self.register[reg_b]:
-                self.register[self.fg] = 0b00000100
+                self.fg = 0b00000100
             # Reg a equal to reg b
             elif self.register[reg_a] == self.register[reg_b]:
-                self.register[self.fg] = 0b00000001
+                self.fg = 0b00000001
 
         else:
             raise Exception("Unsupported ALU operation")
@@ -232,28 +232,29 @@ class CPU:
                 # Increment pc by 1
                 self.pc += 1
 
-                if self.register[self.fg] is 0b00000001:
+                if self.fg is 0b00000001:
                     # Address of instruction after call pushed onto Stack
                     self.register[self.sp] -= 1
                     self.ram[self.register[self.sp]] = self.pc
 
                     self.pc = self.register[self.ram[self.pc]]
-
-                self.pc += 1
+                else:
+                    self.pc += 1
 
             # JNE compare
             elif self.ram[self.pc] is 0b01010110:
                 # Increment pc by 1
                 self.pc += 1
 
-                if self.register[self.fg] is not 0b00000001:
+                if self.fg is not 0b00000001:
+                    print('jne')
                     # Address of instruction after call pushed onto Stack
                     self.register[self.sp] -= 1
                     self.ram[self.register[self.sp]] = self.pc
 
                     self.pc = self.register[self.ram[self.pc]]
-
-                self.pc += 1
+                else:
+                    self.pc += 1
 
             else:
                 print(
