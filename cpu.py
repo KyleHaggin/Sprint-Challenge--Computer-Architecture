@@ -15,7 +15,8 @@ class CPU:
         self.sp = 7
 
         self.pc = 0
-        pass
+
+        self.fg = 6
 
     def load(self, filepath):
         """Load a program into memory."""
@@ -43,20 +44,6 @@ class CPU:
             print('File not found')
             sys.exit(2)
 
-        # program = [
-        #     # From print8.ls8
-        #     0b10000010,  # LDI R0,8
-        #     0b00000000,
-        #     0b00001000,
-        #     0b01000111,  # PRN R0
-        #     0b00000000,
-        #     0b00000001,  # HLT
-        # ]
-
-        # for instruction in program:
-        #     self.ram[address] = instruction
-        #     address += 1
-
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
 
@@ -65,13 +52,25 @@ class CPU:
 
         elif op == 'MULT':
             self.register[reg_a] *= self.register[reg_b]
+
+        elif op == 'COMP':
+            # Reg a greater than reg b
+            if self.register[reg_a] > self.register[reg_b]:
+                self.register[self.fg] = 0b00000010
+            # Reg a less than reg b
+            elif self.register[reg_a] < self.register[reg_b]:
+                self.register[self.fg] = 0b00000100
+            # Reg a equal to reg b
+            elif self.register[reg_a] == self.register[reg_b]:
+                self.register[self.fg] = 0b00000001
+
         else:
             raise Exception("Unsupported ALU operation")
 
     def trace(self):
         """
         Handy function to print out the CPU state. You might want to call this
-        from run() if you need help debugging.
+        fgom run() if you need help debugging.
         """
 
         print(f"TRACE: %02X | %02X %02X %02X |" % (
@@ -113,7 +112,7 @@ class CPU:
                 # Increment self.pc by 1
                 self.pc += 1
 
-            # Register Print
+            # Register LDI set
             elif self.ram[self.pc] is 0b10000010:
                 # Increment self.pc by 1
                 self.pc += 1
@@ -184,7 +183,7 @@ class CPU:
 
                 # Save the value of the memory to the register
                 val = self.ram[self.register[self.sp]]
-                # Copy the value from the address pointed
+                # Copy the value fgom the address pointed
                 # to by sp to the register
                 self.register[self.ram[self.pc]] = val
                 # Increment SP
@@ -209,6 +208,52 @@ class CPU:
             elif self.ram[self.pc] is 0b00010001:
                 self.pc = self.ram[self.register[self.sp]]
                 self.register[self.sp] += 1
+
+            # CMP Compare
+            elif self.ram[self.pc] is 0b10100111:
+                # Increment pc by 1
+                self.pc += 1
+
+                # Save value of pc+1
+                reg_1 = self.ram[self.pc]
+                # Increment pc by 1
+                self.pc += 1
+
+                # Save value of pc+2
+                reg_2 = self.ram[self.pc]
+                # Increment pc by 1
+                self.pc += 1
+
+                # ALU compare reg_1 with reg_2
+                self.alu('COMP', reg_1, reg_2)
+
+            # JEQ compare
+            elif self.ram[self.pc] is 0b01010101:
+                # Increment pc by 1
+                self.pc += 1
+
+                if self.register[self.fg] is 0b00000001:
+                    # Address of instruction after call pushed onto Stack
+                    self.register[self.sp] -= 1
+                    self.ram[self.register[self.sp]] = self.pc
+
+                    self.pc = self.register[self.ram[self.pc]]
+
+                self.pc += 1
+
+            # JNE compare
+            elif self.ram[self.pc] is 0b01010110:
+                # Increment pc by 1
+                self.pc += 1
+
+                if self.register[self.fg] is not 0b00000001:
+                    # Address of instruction after call pushed onto Stack
+                    self.register[self.sp] -= 1
+                    self.ram[self.register[self.sp]] = self.pc
+
+                    self.pc = self.register[self.ram[self.pc]]
+
+                self.pc += 1
 
             else:
                 print(

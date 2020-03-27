@@ -8,7 +8,8 @@ from cpu import *
 cpu = CPU()
 
 cpu.load(
-    'c:/Users/kyleh/Desktop/Repos/Computer-Architecture/ls8/examples/'
-    'call.ls8'
+    'c:/Users/kyleh/Desktop/Repos/Sprint-Challenge--Computer-Architecture/'
+    # 'examples/call.ls8'
+    'sctest.ls8'
     )
 cpu.run()
