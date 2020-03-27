@@ -256,6 +256,12 @@ class CPU:
                 else:
                     self.pc += 1
 
+            elif self.ram[self.pc] is 0b01010100:
+                # Increment pc by 1
+                self.pc += 1
+
+                self.pc = self.register[self.ram[self.pc]]
+
             else:
                 print(
                     f'Unknown instruction: {self.ram[self.pc]}, '
