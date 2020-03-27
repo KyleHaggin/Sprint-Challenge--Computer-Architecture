@@ -255,7 +255,7 @@ class CPU:
                 else:
                     self.pc += 1
 
-            # 
+            # JMP force jump
             elif self.ram[self.pc] is 0b01010100:
                 # Increment pc by 1
                 self.pc += 1
